@@ -1,5 +1,6 @@
 "use client"
 
+import { handleSignUp } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -8,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const userSetupSchema = z.object({
+export const userSetupSchema = z.object({
     firstName: z.string().min(1, "First name is required").max(40),
     lastName: z.string().min(1).max(40),
     username: z.string().min(2).max(32),
@@ -30,8 +31,14 @@ export default function SignUp() {
         }
     })
 
-    function onSubmit(values: z.infer<typeof userSetupSchema>) {
-        console.log(form.getValues());
+    // function onSubmit(values: z.infer<typeof userSetupSchema>) {
+    //     console.log(form.getValues());
+    // }
+
+    const onSubmit = async (values: z.infer<typeof userSetupSchema>) => {
+        const res = await handleSignUp(values);
+
+        console.log(res);
     }
 
     return ( 
