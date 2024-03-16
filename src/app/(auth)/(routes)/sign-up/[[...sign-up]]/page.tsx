@@ -1,6 +1,6 @@
 "use client"
 
-import { handleSignUp } from "@/app/actions";
+import { handleSignUp } from "./signup-action";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
