@@ -1,10 +1,9 @@
 'use server'
 
 import { z } from "zod"
-import { userSetupSchema } from "./page";
 import { currentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
-
+import { userSetupSchema } from "@/schemas/user-setup-schema";
 
 export const handleSignUp = async (data: z.infer<typeof userSetupSchema>) => {
     const validatedFields = userSetupSchema.safeParse(data);
@@ -40,12 +39,12 @@ export const handleSignUp = async (data: z.infer<typeof userSetupSchema>) => {
         return {
             status: 200,
             message: "Success",
-            user
+            user: JSON.parse(JSON.stringify(user))
         };
     } catch (error) {
         return {
             status: 500,
-            message: "Internal Server Error"
+            message: JSON.parse(JSON.stringify(error))
         };
     }
 }

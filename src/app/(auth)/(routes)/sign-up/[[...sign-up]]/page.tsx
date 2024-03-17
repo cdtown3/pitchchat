@@ -8,15 +8,7 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
-export const userSetupSchema = z.object({
-    firstName: z.string().min(1, "First name is required").max(40),
-    lastName: z.string().min(1).max(40),
-    username: z.string().min(2).max(32),
-    email: z.string().email(),
-    password: z.string().min(8).max(64),
-    passwordConfirmation: z.string().min(8).max(64)
-});
+import { userSetupSchema } from "@/schemas/user-setup-schema";
 
 export default function SignUp() {
     const form = useForm<z.infer<typeof userSetupSchema>>({
@@ -30,11 +22,7 @@ export default function SignUp() {
             passwordConfirmation: ""
         }
     })
-
-    // function onSubmit(values: z.infer<typeof userSetupSchema>) {
-    //     console.log(form.getValues());
-    // }
-
+    
     const onSubmit = async (values: z.infer<typeof userSetupSchema>) => {
         const res = await handleSignUp(values);
 
