@@ -1,3 +1,3 @@
-export const currentUser = async () => {
+export const getCurrentUser = async () => {
     return null;
 }

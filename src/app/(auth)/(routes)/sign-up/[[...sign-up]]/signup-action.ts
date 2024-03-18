@@ -1,9 +1,12 @@
 'use server'
 
 import { z } from "zod"
-import { currentUser } from "@/lib/current-user";
+import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { userSetupSchema } from "@/schemas/user-setup-schema";
+import { hashPassword } from "@/lib/passwordUtils";
+import { VerificationType } from "@prisma/client";
+import { generateSecureCode } from "@/lib/generate-verification-code";
 
 export const handleSignUp = async (data: z.infer<typeof userSetupSchema>) => {
     const validatedFields = userSetupSchema.safeParse(data);
@@ -15,36 +18,51 @@ export const handleSignUp = async (data: z.infer<typeof userSetupSchema>) => {
             errors: validatedFields.error.errors
         };
     }
+
+    const { password, ...userData } = validatedFields.data;
     
     try {
-        const curUser = await currentUser();
+        const currUser = await getCurrentUser();
 
-        if (curUser) {
+        if (currUser) {
             return {
                 status: 401,
-                message: "Unauthorized"
+                message: "Unauthorized request. You are already logged in."
             };
         }
 
+        const passwordHash = await hashPassword(password);
+        const verificationCode = generateSecureCode();
+
         const user = await db.user.create({
             data: {
-                password: validatedFields.data.password,
-                username: validatedFields.data.username,
-                email: validatedFields.data.email,
-                firstName: validatedFields.data.firstName,
-                lastName: validatedFields.data.lastName
-            }        
+                password: passwordHash,
+                username: userData.username,
+                email: userData.email,
+                firstName: userData.firstName,
+                lastName: userData.lastName,
+                verifications: {
+                    create: {
+                        contact: userData.email,
+                        type: VerificationType.EMAIL,
+                        code: verificationCode
+                    }
+                }
+            } 
         });
+
+        // NOTE: Send verification email
 
         return {
             status: 200,
-            message: "Success",
-            user: JSON.parse(JSON.stringify(user))
+            message: "Success"
         };
+
     } catch (error) {
+        // NOTE: log error
         return {
             status: 500,
-            message: JSON.parse(JSON.stringify(error))
+            message: "An unexpected error occurred."
         };
     }
 }

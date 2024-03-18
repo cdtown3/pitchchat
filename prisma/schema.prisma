@@ -13,6 +13,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum VerificationType {
+  EMAIL
+  SMS
+}
+
 model User {
   id        String  @id @default(uuid()) @db.Uuid
   password  String
@@ -30,10 +35,11 @@ model User {
 }
 
 model UserVerification {
-  id       String  @id @default(uuid()) @db.Uuid
+  id       String           @id @default(uuid()) @db.Uuid
+  contact  String // The email or phone number to be verified
+  type     VerificationType
   code     String
-  verified Boolean @default(false)
-  type     String
+  verified Boolean          @default(false)
 
   userId String @db.Uuid
   user   User   @relation(fields: [userId], references: [id])
